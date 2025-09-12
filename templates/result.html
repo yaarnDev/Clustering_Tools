@@ -122,6 +122,15 @@
         style="animation-delay: -1s"
       ></div>
     </div>
+    <div class="absolute top-4 right-4 z-20">
+        <div class="bg-white/10 backdrop-blur-lg rounded-full py-2 px-4 text-sm text-gray-300 flex items-center space-x-4">
+            <span>
+                Halo, <strong>{{ session.username }}</strong>
+            </span>
+            <a href="{{ url_for('history') }}" class="hover:text-white transition-colors font-medium">History</a>
+            <a href="{{ url_for('logout') }}" class="hover:text-white text-pink-400 transition-colors font-semibold">Logout</a>
+        </div>
+    </div>
 
     <div class="relative max-w-7xl mx-auto mt-8 animate-fade-in">
       <div class="text-center mb-8 animate-slide-up">
