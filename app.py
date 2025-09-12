@@ -124,16 +124,6 @@ def process():
     if 'user_id' not in session:
         flash('Silakan login untuk melakukan clustering.', 'danger')
         return redirect(url_for('login'))
-
-    # [PERUBAHAN] Kode untuk membersihkan plot LAMA dihapus agar plot bisa disimpan untuk history
-    # try:
-    #     plot_dir = 'static/plots'
-    #     if os.path.exists(plot_dir):
-    #         files = glob.glob(os.path.join(plot_dir, '*'))
-    #         for f in files:
-    #             os.remove(f)
-    # except Exception as e:
-    #     print(f"Error saat membersihkan folder plots: {e}")
     
     file = request.files['file']
     if not file:
@@ -141,14 +131,13 @@ def process():
 
     filename = file.filename
     file_content = io.BytesIO(file.read())
-    file.seek(0) 
-
+    
+    # ... (Sisa kode proses clustering Anda SAMA seperti sebelumnya, tidak ada yang diubah) ...
     if filename.endswith('.csv'):
         df = pd.read_csv(file_content)
     else:
         df = pd.read_excel(file_content)
     
-    # ... (Sisa kode proses clustering Anda SAMA seperti sebelumnya) ...
     expected_columns = ["No", "Nama", "NIM", "Alpro", "Struktur Data", "Basis Data", "Dasar P.Web"]
     missing_cols = [col for col in expected_columns if col not in df.columns]
 
@@ -184,84 +173,31 @@ def process():
     plot_id = str(uuid.uuid4())
     
     scatter_path = f"static/plots/scatter_{plot_id}.png"
-    plt.figure()
-    sns.scatterplot(x=data_normalized[:, 0], y=data_normalized[:, 1], hue=df['Kategori'], palette='viridis')
-    plt.title("Visualisasi Clustering Mahasiswa")
-    plt.xlabel(selected_features[0])
-    plt.ylabel(selected_features[1])
-    plt.savefig(scatter_path)
-    plt.close()
+    plt.figure(); sns.scatterplot(x=data_normalized[:, 0], y=data_normalized[:, 1], hue=df['Kategori'], palette='viridis'); plt.title("Visualisasi Clustering Mahasiswa"); plt.xlabel(selected_features[0]); plt.ylabel(selected_features[1]); plt.savefig(scatter_path); plt.close()
 
     hist_paths = []
     for i, feature in enumerate(selected_features):
-        path = f"static/plots/hist_{i}_{plot_id}.png"
-        plt.figure()
-        plt.hist(df[feature], bins=10, edgecolor='black')
-        plt.title(f"Distribusi {feature}")
-        plt.savefig(path)
-        hist_paths.append(path)
-        plt.close()
+        path = f"static/plots/hist_{i}_{plot_id}.png"; plt.figure(); plt.hist(df[feature], bins=10, edgecolor='black'); plt.title(f"Distribusi {feature}"); plt.savefig(path); hist_paths.append(path); plt.close()
 
-    boxplot_path = f"static/plots/boxplot_{plot_id}.png"
-    plt.figure()
-    sns.boxplot(x=df['Kategori'], y=df[selected_features[0]], palette='coolwarm')
-    plt.title(f"Boxplot {selected_features[0]} berdasarkan Kategori Clustering")
-    plt.savefig(boxplot_path)
-    plt.close()
-
-    pie_path = f"static/plots/pie_{plot_id}.png"
-    plt.figure()
-    df['Kategori'].value_counts().plot.pie(autopct='%1.1f%%', colors=['red', 'yellow', 'green'])
-    plt.title("Proporsi Mahasiswa dalam Setiap Cluster")
-    plt.ylabel("")
-    plt.savefig(pie_path)
-    plt.close()
+    boxplot_path = f"static/plots/boxplot_{plot_id}.png"; plt.figure(); sns.boxplot(x=df['Kategori'], y=df[selected_features[0]], palette='coolwarm'); plt.title(f"Boxplot {selected_features[0]} berdasarkan Kategori Clustering"); plt.savefig(boxplot_path); plt.close()
     
-    heatmap_path = f"static/plots/heatmap_{plot_id}.png"
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(df_normalized[selected_features], annot=True, cmap='YlGnBu', cbar=True)
-    plt.title("Ilustrasi Normalisasi Nilai Praktikum Mahasiswa")
-    plt.xlabel("Mata Kuliah")
-    plt.ylabel("Mahasiswa")
-    plt.savefig(heatmap_path)
-    plt.close()
+    pie_path = f"static/plots/pie_{plot_id}.png"; plt.figure(); df['Kategori'].value_counts().plot.pie(autopct='%1.1f%%', colors=['red', 'yellow', 'green']); plt.title("Proporsi Mahasiswa dalam Setiap Cluster"); plt.ylabel(""); plt.savefig(pie_path); plt.close()
+    
+    heatmap_path = f"static/plots/heatmap_{plot_id}.png"; plt.figure(figsize=(10, 6)); sns.heatmap(df_normalized[selected_features], annot=True, cmap='YlGnBu', cbar=True); plt.title("Ilustrasi Normalisasi Nilai Praktikum Mahasiswa"); plt.xlabel("Mata Kuliah"); plt.ylabel("Mahasiswa"); plt.savefig(heatmap_path); plt.close()
 
-    hasil_path = 'hasil_clustering.csv'
-    df_sorted.to_csv(hasil_path, index=False)
+    hasil_path = 'hasil_clustering.csv'; df_sorted.to_csv(hasil_path, index=False)
 
-    # [KODE TAMBAHAN] Simpan ke history MongoDB
     hasil_json = df_sorted.to_dict(orient='records')
     history_record = {
-        "user_id": ObjectId(session['user_id']),
-        "username": session['username'],
-        "filename": filename,
-        "cluster_results_summary": {
-            "silhouette_score": silhouette,
-            "inertia": inertia,
-            "total_data": len(df_sorted)
-        },
+        "user_id": ObjectId(session['user_id']), "username": session['username'], "filename": filename,
+        "cluster_results_summary": {"silhouette_score": silhouette, "inertia": inertia, "total_data": len(df_sorted)},
         "results_data": hasil_json,
-        "plot_paths": { # Simpan path ke gambar plot untuk ditampilkan di history
-            "scatter": scatter_path,
-            "histograms": hist_paths,
-            "boxplot": boxplot_path,
-            "pie": pie_path,
-            "heatmap": heatmap_path
-        },
+        "plot_paths": {"scatter": scatter_path, "histograms": hist_paths, "boxplot": boxplot_path, "pie": pie_path, "heatmap": heatmap_path},
         "timestamp": datetime.datetime.utcnow()
     }
     history_collection.insert_one(history_record)
 
-    return render_template("result.html",
-                           tables=[df_sorted.to_html(classes="table table-bordered", index=False)],
-                           normalized=df_normalized.to_html(classes="table table-sm table-striped", index=False),
-                           score=silhouette,
-                           inertia_score=inertia,
-                           scatter_plot=scatter_path,
-                           histograms=hist_paths,
-                           boxplot=boxplot_path,
-                           pie_chart=pie_path,
-                           heatmap_plot=heatmap_path)
+    return render_template("result.html", tables=[df_sorted.to_html(classes="table table-bordered", index=False)], normalized=df_normalized.to_html(classes="table table-sm table-striped", index=False), score=silhouette, inertia_score=inertia, scatter_plot=scatter_path, histograms=hist_paths, boxplot=boxplot_path, pie_chart=pie_path, heatmap_plot=heatmap_path)
 
 
 @app.route('/history')
@@ -269,34 +205,88 @@ def history():
     if 'user_id' not in session:
         return redirect(url_for('login'))
     
-    user_history = history_collection.find(
+    user_history_cursor = history_collection.find(
         {'user_id': ObjectId(session['user_id'])}
     ).sort('timestamp', -1)
     
-    return render_template('history.html', history_data=user_history)
+    # [PERUBAHAN] Mengubah cursor menjadi list dan menambahkan 'id'
+    # Ini agar template bisa mengakses ID unik (_id) untuk tombol hapus
+    history_list = []
+    for record in user_history_cursor:
+        record['id'] = str(record['_id']) # Mengonversi ObjectId ke string
+        history_list.append(record)
+    
+    return render_template('history.html', history_data=history_list)
+
 
 # =================================================================
-# BAGIAN 5: ROUTE LAINNYA (Preview, Download - TIDAK BERUBAH)
+# BAGIAN 5: [BARU] ROUTE UNTUK MENGHAPUS HISTORY
+# =================================================================
+@app.route('/delete_history/<history_id>', methods=['POST'])
+def delete_history(history_id):
+    if 'user_id' not in session:
+        flash('Anda harus login untuk melakukan aksi ini.', 'danger')
+        return redirect(url_for('login'))
+
+    try:
+        # 1. Cari record di MongoDB berdasarkan ID dalam bentuk string
+        record_to_delete = history_collection.find_one({'_id': ObjectId(history_id)})
+        
+        if not record_to_delete:
+            flash('Riwayat tidak ditemukan.', 'danger')
+            return redirect(url_for('history'))
+
+        # 2. Pastikan record ini milik user yang sedang login (keamanan)
+        if record_to_delete['user_id'] != ObjectId(session['user_id']):
+            flash('Anda tidak memiliki izin untuk menghapus riwayat ini.', 'danger')
+            return redirect(url_for('history'))
+
+        # 3. Hapus file-file plot yang terkait dari folder static
+        if 'plot_paths' in record_to_delete and record_to_delete['plot_paths']:
+            plot_paths = record_to_delete['plot_paths']
+            
+            # Loop melalui semua path di dictionary plot_paths
+            for key, path_or_list in plot_paths.items():
+                if isinstance(path_or_list, list): # Kasus khusus untuk histograms
+                    for path in path_or_list:
+                        full_path = os.path.join(app.root_path, path)
+                        if os.path.exists(full_path):
+                            os.remove(full_path)
+                else: # Untuk path tunggal seperti scatter, pie, dll.
+                    full_path = os.path.join(app.root_path, path_or_list)
+                    if os.path.exists(full_path):
+                        os.remove(full_path)
+        
+        # 4. Hapus record dari database MongoDB
+        history_collection.delete_one({'_id': ObjectId(history_id)})
+
+        # 5. Beri notifikasi ke user dan redirect
+        flash('Riwayat berhasil dihapus.', 'success')
+
+    except Exception as e:
+        flash(f'Terjadi kesalahan saat menghapus riwayat: {e}', 'danger')
+
+    return redirect(url_for('history'))
+
+
+# =================================================================
+# BAGIAN 6: ROUTE LAINNYA (Preview, Download - TIDAK BERUBAH)
 # =================================================================
 @app.route('/preview_excel', methods=['POST'])
 def preview_excel():
     # ... (Kode /preview_excel Anda SAMA seperti sebelumnya) ...
-    file = request.files['file']
-    if not file:
-        return "No file uploaded", 400
+    file = request.files['file'];
+    if not file: return "No file uploaded", 400
     filename = file.filename
     expected_columns = ["No", "Nama", "NIM", "Alpro", "Struktur Data", "Basis Data", "Dasar P.Web"]
     try:
-        if filename.endswith('.csv'):
-            df = pd.read_csv(io.StringIO(file.read().decode('utf-8')), nrows=5)
-        else:
-            df = pd.read_excel(file, nrows=5)
+        if filename.endswith('.csv'): df = pd.read_csv(io.StringIO(file.read().decode('utf-8')), nrows=5)
+        else: df = pd.read_excel(file, nrows=5)
         missing_cols = [col for col in expected_columns if col not in df.columns]
-        if missing_cols:
-            return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">...</div>""", 400
+        if missing_cols: return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Kolom berikut tidak ditemukan: {', '.join(missing_cols)}</div>""", 400
         return df.to_html(classes="preview-table", index=False)
     except Exception as e:
-        return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">...</div>""", 500
+        return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Error membaca file: {e}</div>""", 500
 
 
 @app.route('/download')
@@ -310,7 +300,9 @@ def download():
 
 @app.route('/download_histograms')
 def download_histograms():
-    # [PERUBAHAN] Kode untuk menghapus file LAMA dihapus
+    # ... (Kode /download_histograms Anda SAMA seperti sebelumnya) ...
+    # Di sini perlu logika untuk mengambil path histogram dari record history terakhir jika ingin spesifik
+    # Untuk sementara, ini akan mengunduh semua file hist yang ada
     hist_files = [f for f in os.listdir('static/plots') if f.startswith('hist_')]
     if not hist_files:
         return "Tidak ada file histogram yang dapat diunduh.", 404
@@ -319,12 +311,11 @@ def download_histograms():
         for filename in hist_files:
             file_path = os.path.join('static/plots', filename)
             zf.write(file_path, filename)
-            # os.remove(file_path) # Baris ini dihapus
     memory_file.seek(0)
     return send_file(memory_file, mimetype='application/zip', as_attachment=True, download_name='histograms.zip')
 
 # =================================================================
-# BAGIAN 6: MENJALANKAN APLIKASI
+# BAGIAN 7: MENJALANKAN APLIKASI
 # =================================================================
 if __name__ == '__main__':
     app.run(debug=True)

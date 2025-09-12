@@ -4,6 +4,11 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Hasil Clustering</title>
+    <link
+      rel="icon"
+      type="image/png"
+      href="{{ url_for('static', filename='favicon.png') }}"
+    />
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
@@ -26,10 +31,7 @@
                 "0%, 100%": { transform: "translateY(0px)" },
                 "50%": { transform: "translateY(-10px)" },
               },
-              fadeIn: {
-                "0%": { opacity: "0" },
-                "100%": { opacity: "1" },
-              },
+              fadeIn: { "0%": { opacity: "0" }, "100%": { opacity: "1" } },
               slideUp: {
                 "0%": { transform: "translateY(30px)", opacity: "0" },
                 "100%": { transform: "translateY(0)", opacity: "1" },
@@ -49,111 +51,52 @@
     </script>
     <style>
       /* Custom table styling to match the modern theme */
-      .table-container table {
-        width: 100%;
-        border-collapse: collapse;
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border-radius: 12px;
-        overflow: hidden;
+      .table-container table { width: 100%; border-collapse: collapse; }
+      .table-container th { background: rgba(255, 255, 255, 0.1); color: white; font-weight: 600; padding: 16px; text-align: left; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+      .table-container td { color: rgba(255, 255, 255, 0.9); padding: 12px 16px; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+      .table-container tr:not(:first-child):hover { background: rgba(255, 255, 255, 0.05); }
+      .table-container tr:last-child td { border-bottom: none; }
+      
+      /* CSS BARU UNTUK TABEL RESPONSIF */
+      @media screen and (max-width: 768px) {
+        .table-container thead { display: none; }
+        .table-container tr { display: block; margin-bottom: 1rem; border-radius: 12px; border: 1px solid rgba(255, 255, 255, 0.1); background: rgba(255, 255, 255, 0.05); overflow: hidden; }
+        .table-container td { display: flex; justify-content: space-between; align-items: center; padding: 0.75rem 1rem; text-align: right; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
+        .table-container td::before { content: attr(data-label); font-weight: 600; text-align: left; margin-right: 1rem; color: rgba(255, 255, 255, 0.7); }
+        .table-container td:last-child { border-bottom: none; }
+        .table-container table, .table-container tbody, .table-container th { display: block; }
       }
 
-      .table-container th {
-        background: rgba(255, 255, 255, 0.1);
-        color: white;
-        font-weight: 600;
-        padding: 16px;
-        text-align: left;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      }
-
-      .table-container td {
-        color: rgba(255, 255, 255, 0.9);
-        padding: 12px 16px;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      }
-
-      .table-container tr:hover {
-        background: rgba(255, 255, 255, 0.05);
-      }
-
-      .table-container tr:last-child td {
-        border-bottom: none;
-      }
-
-      .page-btn {
-        padding: 8px 12px;
-        background: rgba(255, 255, 255, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        border-radius: 8px;
-        color: white;
-        font-size: 14px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-      }
-
-      .page-btn:hover {
-        background: rgba(255, 255, 255, 0.2);
-      }
-
-      .page-btn.active {
-        background: rgba(59, 130, 246, 0.8);
-        border-color: rgba(59, 130, 246, 1);
-      }
+      .page-btn { padding: 8px 12px; background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px; color: white; font-size: 14px; cursor: pointer; transition: all 0.3s ease; }
+      .page-btn:hover { background: rgba(255, 255, 255, 0.2); }
+      .page-btn.active { background: rgba(59, 130, 246, 0.8); border-color: rgba(59, 130, 246, 1); }
     </style>
   </head>
   <body
-    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 animate-gradient bg-[length:400%_400%] p-4"
+    class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 animate-gradient bg-[length:400%_400%] p-4 sm:p-6"
   >
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div
-        class="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-float"
-      ></div>
-      <div
-        class="absolute top-40 right-32 w-48 h-48 bg-blue-500/10 rounded-full blur-xl animate-float"
-        style="animation-delay: -2s"
-      ></div>
-      <div
-        class="absolute bottom-32 left-1/4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl animate-float"
-        style="animation-delay: -4s"
-      ></div>
-      <div
-        class="absolute bottom-20 right-20 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-float"
-        style="animation-delay: -1s"
-      ></div>
+      <div class="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-float"></div>
+      <div class="absolute top-40 right-32 w-48 h-48 bg-blue-500/10 rounded-full blur-xl animate-float" style="animation-delay: -2s"></div>
+      <div class="absolute bottom-32 left-1/4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl animate-float" style="animation-delay: -4s"></div>
+      <div class="absolute bottom-20 right-20 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-float" style="animation-delay: -1s"></div>
     </div>
     <div class="absolute top-4 right-4 z-20">
-        <div class="bg-white/10 backdrop-blur-lg rounded-full py-2 px-4 text-sm text-gray-300 flex items-center space-x-4">
-            <span>
-                Halo, <strong>{{ session.username }}</strong>
-            </span>
-            <a href="{{ url_for('history') }}" class="hover:text-white transition-colors font-medium">History</a>
-            <a href="{{ url_for('logout') }}" class="hover:text-white text-pink-400 transition-colors font-semibold">Logout</a>
-        </div>
+      <div class="bg-white/10 backdrop-blur-lg rounded-full py-2 px-4 text-sm text-gray-300 flex items-center space-x-4">
+        <span> Halo, <strong>{{ session.username }}</strong> </span>
+        <a href="{{ url_for('history') }}" class="hover:text-white transition-colors font-medium">History</a>
+        <a href="{{ url_for('logout') }}" class="hover:text-white text-pink-400 transition-colors font-semibold">Logout</a>
+      </div>
     </div>
 
     <div class="relative max-w-7xl mx-auto mt-8 animate-fade-in">
       <div class="text-center mb-8 animate-slide-up">
-        <div
-          class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mb-6 animate-bounce-gentle"
-        >
-          <svg
-            class="w-12 h-12 text-white"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            ></path>
+        <div class="inline-flex items-center justify-center w-24 h-24 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full mb-6 animate-bounce-gentle">
+          <svg class="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
-        <h1
-          class="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent"
-        >
+        <h1 class="text-4xl font-bold text-white mb-3 bg-gradient-to-r from-green-400 via-emerald-400 to-teal-400 bg-clip-text text-transparent">
           Clustering Berhasil!
         </h1>
         <p class="text-xl text-gray-300 font-light">
@@ -162,49 +105,20 @@
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-10 mb-12">
-        <div
-          class="w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 px-10 py-6 text-center text-white"
-        >
-          <div
-            class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-full mx-auto mb-3"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 6h16M4 10h16M4 14h16M4 18h16"
-              ></path>
+        <div class="w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 px-10 py-6 text-center text-white">
+          <div class="flex items-center justify-center w-14 h-14 bg-blue-500 rounded-full mx-auto mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path>
             </svg>
           </div>
           <h3 class="text-lg font-bold mb-1">Silhouette Score</h3>
           <p class="text-3xl font-extrabold text-cyan-400">{{ score }}</p>
           <p class="text-sm mt-1">Semakin tinggi semakin baik (maks: 1.0)</p>
         </div>
-
-        <div
-          class="w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 px-10 py-6 text-center text-white"
-        >
-          <div
-            class="flex items-center justify-center w-14 h-14 bg-yellow-500 rounded-full mx-auto mb-3"
-          >
-            <svg
-              class="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M3 10h11M9 21V3m12 7h-6m6 4h-6"
-              ></path>
+        <div class="w-full bg-white/10 backdrop-blur-lg rounded-2xl shadow-xl border border-white/20 px-10 py-6 text-center text-white">
+          <div class="flex items-center justify-center w-14 h-14 bg-yellow-500 rounded-full mx-auto mb-3">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h11M9 21V3m12 7h-6m6 4h-6"></path>
             </svg>
           </div>
           <h3 class="text-lg font-bold mb-1">Inertia Score</h3>
@@ -215,188 +129,80 @@
         </div>
       </div>
 
-      <div
-        class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 mt-10 mb-8"
-      >
-        <div class="flex items-center justify-between mb-6">
+      <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-4 sm:p-8 mt-10 mb-8">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
           <div class="flex items-center">
-            <div
-              class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-4"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"
-                />
-              </svg>
+            <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v16a1 1 0 01-1 1H4a1 1 0 01-1-1V4z"/></svg>
             </div>
             <h2 class="text-2xl font-bold text-white">
               Hasil Normalisasi Data (Min-Max)
             </h2>
           </div>
-
-          <div class="relative">
-            <input
-              type="text"
-              id="searchNormalized"
-              placeholder="Cari data..."
-              class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-            />
-            <svg
-              class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-              />
-            </svg>
+          <div class="relative w-full md:w-auto">
+            <input type="text" id="searchNormalized" placeholder="Cari data..." class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+            <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg>
           </div>
         </div>
-
-        <div class="overflow-x-auto rounded-2xl bg-white/5 backdrop-blur-sm">
+        <div class="overflow-x-auto rounded-2xl">
           <div id="normalizedContainer" class="table-container">
             {{ normalized|safe }}
           </div>
         </div>
-
-        <div class="flex items-center justify-between mt-6">
-          <div class="flex items-center space-x-2">
-            <span class="text-gray-300 text-sm">Tampilkan</span>
-            <select
-              id="normalizedRowsPerPage"
-              class="bg-white-500/10 backdrop-blur-sm border border-blue/20 rounded-lg px-3 py-1 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="10">10</option>
-              <option value="25">25</option>
-              <option value="50">50</option>
-              <option value="100">100</option>
+        <div class="flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+          <div class="flex items-center space-x-2 text-sm text-gray-300">
+            <span>Tampilkan</span>
+            <select id="normalizedRowsPerPage" class="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+              <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option>
             </select>
-            <span class="text-gray-300 text-sm">baris per halaman</span>
+            <span>baris</span>
           </div>
-
           <div class="flex items-center space-x-2">
-            <button
-              id="normalizedPrev"
-              class="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              ← Prev
-            </button>
+            <button id="normalizedPrev" class="page-btn">← Prev</button>
             <div id="normalizedPages" class="flex space-x-1"></div>
-            <button
-              id="normalizedNext"
-              class="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              Next →
-            </button>
+            <button id="normalizedNext" class="page-btn">Next →</button>
           </div>
-
           <div class="text-gray-300 text-sm">
-            <span id="normalizedInfo">Menampilkan 1-10 dari X data</span>
+            <span id="normalizedInfo"></span>
           </div>
         </div>
       </div>
 
       <div class="space-y-6 animate-slide-up" style="animation-delay: 0.4s">
         {% for table in tables %}
-        <div
-          class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 overflow-hidden"
-        >
-          <div class="flex items-center justify-between mb-6">
+        <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-4 sm:p-8 overflow-hidden">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-6">
             <div class="flex items-center">
-              <div
-                class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"
-                  ></path>
-                </svg>
+              <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
               </div>
               <h3 class="text-2xl font-bold text-white">Hasil Clustering</h3>
             </div>
-
-            <div class="relative">
-              <input
-                type="text"
-                id="searchInput"
-                placeholder="Cari data..."
-                class="bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              />
-              <svg
-                class="w-5 h-5 text-gray-400 absolute left-3 top-2.5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                ></path>
-              </svg>
+            <div class="relative w-full md:w-auto">
+              <input type="text" id="searchInput_{{ loop.index }}" placeholder="Cari data..." class="w-full bg-white/10 backdrop-blur-sm border border-white/20 rounded-xl px-4 py-2 pl-10 text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"/>
+              <svg class="w-5 h-5 text-gray-400 absolute left-3 top-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
             </div>
           </div>
-
-          <div class="overflow-x-auto rounded-2xl bg-white/5 backdrop-blur-sm">
-            <div id="tableContainer" class="table-container">
+          <div class="overflow-x-auto rounded-2xl">
+            <div id="tableContainer_{{ loop.index }}" class="table-container">
               {{ table|safe }}
             </div>
           </div>
-
-          <div class="flex items-center justify-between mt-6">
-            <div class="flex items-center space-x-2">
-              <span class="text-gray-300 text-sm">Tampilkan</span>
-              <select
-                id="rowsPerPage"
-                class="bg-white-500/10 backdrop-blur-sm border border-blue/20 rounded-lg px-3 py-1 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="10">10</option>
-                <option value="25">25</option>
-                <option value="50">50</option>
-                <option value="100">100</option>
+          <div class="flex flex-col md:flex-row items-center justify-between gap-4 mt-6">
+            <div class="flex items-center space-x-2 text-sm text-gray-300">
+              <span>Tampilkan</span>
+              <select id="rowsPerPage_{{ loop.index }}" class="bg-white/20 backdrop-blur-sm border border-white/30 rounded-lg px-2 py-1 text-black text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                <option value="10">10</option><option value="25">25</option><option value="50">50</option><option value="100">100</option>
               </select>
-              <span class="text-gray-300 text-sm">baris per halaman</span>
+              <span>baris</span>
             </div>
-
             <div class="flex items-center space-x-2">
-              <button
-                id="prevPage"
-                class="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                ← Prev
-              </button>
-              <div id="pageNumbers" class="flex space-x-1"></div>
-              <button
-                id="nextPage"
-                class="px-3 py-1 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg text-white text-sm hover:bg-white/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                Next →
-              </button>
+              <button id="prevPage_{{ loop.index }}" class="page-btn">← Prev</button>
+              <div id="pageNumbers_{{ loop.index }}" class="flex space-x-1"></div>
+              <button id="nextPage_{{ loop.index }}" class="page-btn">Next →</button>
             </div>
-
             <div class="text-gray-300 text-sm">
-              <span id="showingInfo">Menampilkan 1-10 dari 100 data</span>
+              <span id="showingInfo_{{ loop.index }}"></span>
             </div>
           </div>
         </div>
@@ -405,239 +211,86 @@
 
       <div class="mt-12 animate-slide-up" style="animation-delay: 0.6s">
         <div class="text-center mb-8">
-          <h2
-            class="text-3xl font-bold text-white mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent"
-          >
+          <h2 class="text-3xl font-bold text-white mb-3 bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400 bg-clip-text text-transparent">
             Visualisasi Data
           </h2>
           <p class="text-gray-300">
             Grafik dan chart untuk memahami pola clustering
           </p>
         </div>
-
         {% if heatmap_plot %}
-        <div
-          class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6 mt-10 mb-8"
-        >
+        <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6 mt-10 mb-8">
           <div class="flex items-center mb-4">
-            <div
-              class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3"
-            >
-              <svg
-                class="w-5 h-5 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 6h16M4 10h16M4 14h16M4 18h16"
-                ></path>
-              </svg>
+            <div class="w-10 h-10 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full flex items-center justify-center mr-3">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 10h16M4 14h16M4 18h16"></path></svg>
             </div>
             <h3 class="text-xl font-bold text-white">
               Ilustrasi Normalisasi (Heatmap)
             </h3>
           </div>
-          <a
-            href="{{ heatmap_plot }}"
-            download="heatmap_normalisasi.png"
-            class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-              ></path>
-            </svg>
+          <a href="{{ heatmap_plot }}" download="heatmap_normalisasi.png" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
           </a>
           <div class="bg-white/5 rounded-2xl p-4 text-center">
-            <img
-              src="{{ heatmap_plot }}"
-              alt="Heatmap Normalisasi"
-              class="w-full max-w-4xl mx-auto rounded-xl shadow-lg border border-white/20"
-            />
+            <img src="{{ heatmap_plot }}" alt="Heatmap Normalisasi" class="w-full max-w-4xl mx-auto rounded-xl shadow-lg border border-white/20"/>
           </div>
         </div>
         {% endif %}
-
         <div class="grid lg:grid-cols-2 gap-8">
           {% if scatter_plot %}
-          <div
-            class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6"
-          >
+          <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6">
             <div class="flex items-center mb-4">
-              <div
-                class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-3"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"
-                  ></path>
-                </svg>
+              <div class="w-10 h-10 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mr-3">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-white">
                 Scatter Plot Clustering
               </h3>
             </div>
-            <a
-              href="{{ scatter_plot }}"
-              download="scatter_plot_clustering.png"
-              class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                ></path>
-              </svg>
+            <a href="{{ scatter_plot }}" download="scatter_plot_clustering.png" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
             <div class="bg-white/5 rounded-2xl p-4 text-center">
-              <img
-                src="{{ scatter_plot }}"
-                alt="Scatter Plot"
-                class="w-full max-w-md mx-auto rounded-xl shadow-lg"
-              />
+              <img src="{{ scatter_plot }}" alt="Scatter Plot" class="w-full max-w-md mx-auto rounded-xl shadow-lg"/>
             </div>
           </div>
           {% endif %} {% if pie_chart %}
-          <div
-            class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6"
-          >
+          <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6">
             <div class="flex items-center mb-4">
-              <div
-                class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mr-3"
-              >
-                <svg
-                  class="w-5 h-5 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"
-                  ></path>
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"
-                  ></path>
-                </svg>
+              <div class="w-10 h-10 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mr-3">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
               </div>
               <h3 class="text-xl font-bold text-white">Pie Chart</h3>
             </div>
-            <a
-              href="{{ pie_chart }}"
-              download="pie_chart_proporsi.png"
-              class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200"
-            >
-              <svg
-                class="w-6 h-6 text-white"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                ></path>
-              </svg>
+            <a href="{{ pie_chart }}" download="pie_chart_proporsi.png" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
             </a>
             <div class="bg-white/5 rounded-2xl p-4 text-center">
-              <img
-                src="{{ pie_chart }}"
-                alt="Pie Chart"
-                class="w-full max-w-md mx-auto rounded-xl shadow-lg"
-              />
+              <img src="{{ pie_chart }}" alt="Pie Chart" class="w-full max-w-md mx-auto rounded-xl shadow-lg"/>
             </div>
           </div>
           {% endif %} {% if histograms %}
           <div class="lg:col-span-2">
-            <div
-              class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6"
-            >
+            <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6">
               <div class="flex items-center justify-between mb-6">
                 <div class="flex items-center">
-                  <div
-                    class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-3"
-                  >
-                    <svg
-                      class="w-5 h-5 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                      ></path>
-                    </svg>
+                  <div class="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mr-3">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                   </div>
                   <h3 class="text-xl font-bold text-white">
                     Distribusi Nilai Mata Kuliah
                   </h3>
                 </div>
                 <div>
-                  <a
-                    href="/download_histograms"
-                    class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200"
-                  >
-                    <svg
-                      class="w-6 h-6 text-white"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                      ></path>
-                    </svg>
+                  <a href="/download_histograms" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200">
+                    <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                   </a>
                 </div>
               </div>
               <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {% for hist in histograms %}
                 <div class="bg-white/5 rounded-2xl p-4 text-center">
-                  <img
-                    src="{{ hist }}"
-                    alt="Histogram"
-                    class="w-full rounded-xl shadow-lg"
-                  />
+                  <img src="{{ hist }}" alt="Histogram" class="w-full rounded-xl shadow-lg"/>
                 </div>
                 {% endfor %}
               </div>
@@ -645,56 +298,20 @@
           </div>
           {% endif %} {% if boxplot %}
           <div class="lg:col-span-2">
-            <div
-              class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6"
-            >
+            <div class="relative bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-6">
               <div class="flex items-center mb-4">
-                <div
-                  class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3"
-                >
-                  <svg
-                    class="w-5 h-5 text-white"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      stroke-linecap="round"
-                      stroke-linejoin="round"
-                      stroke-width="2"
-                      d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-                    ></path>
-                  </svg>
+                <div class="w-10 h-10 bg-gradient-to-r from-orange-500 to-red-500 rounded-full flex items-center justify-center mr-3">
+                  <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
                 </div>
                 <h3 class="text-xl font-bold text-white">
                   Boxplot Berdasarkan Kategori
                 </h3>
               </div>
-              <a
-                href="{{ boxplot }}"
-                download="boxplot_kategori.png"
-                class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200"
-              >
-                <svg
-                  class="w-6 h-6 text-white"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="2"
-                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"
-                  ></path>
-                </svg>
+              <a href="{{ boxplot }}" download="boxplot_kategori.png" class="absolute top-6 right-6 p-2 bg-white/20 hover:bg-white/30 rounded-full transition-colors duration-200">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
               </a>
               <div class="bg-white/5 rounded-2xl p-4 text-center">
-                <img
-                  src="{{ boxplot }}"
-                  alt="Boxplot"
-                  class="w-full max-w-2xl mx-auto rounded-xl shadow-lg"
-                />
+                <img src="{{ boxplot }}" alt="Boxplot" class="w-full max-w-2xl mx-auto rounded-xl shadow-lg"/>
               </div>
             </div>
           </div>
@@ -702,128 +319,39 @@
         </div>
       </div>
 
-      <div
-        class="flex flex-col sm:flex-row gap-4 justify-center mt-12 animate-slide-up"
-        style="animation-delay: 0.8s"
-      >
-        <a
-          href="/download"
-          class="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center"
-        >
+      <div class="flex flex-col sm:flex-row gap-4 justify-center mt-12 animate-slide-up" style="animation-delay: 0.8s">
+        <a href="/download" class="group relative px-8 py-4 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center">
           <span class="flex items-center justify-center">
-            <svg
-              class="w-6 h-6 mr-3 group-hover:animate-bounce"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-              ></path>
-            </svg>
+            <svg class="w-6 h-6 mr-3 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
             Download Hasil
           </span>
         </a>
-
-        <a
-          href="/"
-          class="group relative px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center backdrop-blur-sm"
-        >
+        <a href="/" class="group relative px-8 py-4 bg-white/10 hover:bg-white/20 border border-white/30 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-center backdrop-blur-sm">
           <span class="flex items-center justify-center">
-            <svg
-              class="w-6 h-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 19l-7-7m0 0l7-7m-7 7h18"
-              ></path>
-            </svg>
+            <svg class="w-6 h-6 mr-3 group-hover:-translate-x-1 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
             Analisis Baru
           </span>
         </a>
       </div>
 
-      <div
-        class="grid md:grid-cols-3 gap-6 mt-12 animate-slide-up"
-        style="animation-delay: 1s"
-      >
-        <div
-          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center"
-        >
-          <div
-            class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
-              ></path>
-            </svg>
+      <div class="grid md:grid-cols-3 gap-6 mt-12 animate-slide-up" style="animation-delay: 1s">
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+          <div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg>
           </div>
           <h3 class="text-white font-semibold mb-2">Akurasi Tinggi</h3>
-          <p class="text-gray-400 text-sm">
-            Algoritma machine learning terdepan
-          </p>
+          <p class="text-gray-400 text-sm">Algoritma machine learning terdepan</p>
         </div>
-
-        <div
-          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center"
-        >
-          <div
-            class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-              ></path>
-            </svg>
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+          <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           </div>
           <h3 class="text-white font-semibold mb-2">Proses Cepat</h3>
           <p class="text-gray-400 text-sm">Optimisasi performa maksimal</p>
         </div>
-
-        <div
-          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center"
-        >
-          <div
-            class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4"
-          >
-            <svg
-              class="w-6 h-6 text-white"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              ></path>
-            </svg>
+        <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 text-center">
+          <div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
           </div>
           <h3 class="text-white font-semibold mb-2">Data Aman</h3>
           <p class="text-gray-400 text-sm">Keamanan enterprise grade</p>
@@ -832,21 +360,25 @@
     </div>
 
     <script>
-      function setupTable(
-        containerId,
-        searchInputId,
-        rowsPerPageId,
-        prevBtnId,
-        pageNumbersId,
-        nextBtnId,
-        infoId
-      ) {
+      // SCRIPT BARU UNTUK MEMBUAT TABEL RESPONSIF
+      function makeTablesResponsive() {
+        document.querySelectorAll(".table-container").forEach((container) => {
+          const table = container.querySelector("table");
+          if (!table) return;
+          const headers = Array.from(table.querySelectorAll("th")).map((th) => th.textContent.trim());
+          table.querySelectorAll("tbody tr").forEach((row) => {
+            row.querySelectorAll("td").forEach((cell, index) => {
+              cell.setAttribute("data-label", headers[index]);
+            });
+          });
+        });
+      }
+
+      function setupTable(containerId, searchInputId, rowsPerPageId, prevBtnId, pageNumbersId, nextBtnId, infoId) {
         const container = document.getElementById(containerId);
         if (!container) return;
-
         const table = container.querySelector("table");
         if (!table) return;
-
         const tbody = table.querySelector("tbody");
         if (!tbody) return;
 
@@ -856,22 +388,12 @@
         let allRows = Array.from(tbody.querySelectorAll("tr"));
         let filteredRows = [...allRows];
 
-        function updateRowNumbers() {
-          filteredRows.forEach((row, index) => {
-            const cell = row.querySelector("td:first-child");
-            if (cell) {
-              cell.textContent = index + 1;
-            }
-          });
-        }
-
         function displayRows() {
           const startIndex = (currentPage - 1) * rowsPerPage;
           const endIndex = startIndex + rowsPerPage;
-
-          allRows.forEach((row) => (row.style.display = "none")); // Sembunyikan semua baris
+          allRows.forEach((row) => (row.style.display = "none"));
           filteredRows.slice(startIndex, endIndex).forEach((row) => {
-            row.style.display = ""; // Tampilkan baris yang ada di halaman ini
+            row.style.display = "";
           });
         }
 
@@ -886,18 +408,20 @@
 
           if (pageNumbersContainer) {
             pageNumbersContainer.innerHTML = "";
-            let startPage = Math.max(1, currentPage - 2);
-            let endPage = Math.min(totalPages, startPage + 4);
-
-            if (endPage - startPage < 4) {
-              startPage = Math.max(1, endPage - 4);
+            let startPage, endPage;
+            if (window.innerWidth < 768) {
+                startPage = Math.max(1, currentPage - 1);
+                endPage = Math.min(totalPages, startPage + 2);
+            } else {
+                startPage = Math.max(1, currentPage - 2);
+                endPage = Math.min(totalPages, startPage + 4);
+                if (endPage - startPage < 4) {
+                    startPage = Math.max(1, endPage - 4);
+                }
             }
-
             for (let i = startPage; i <= endPage; i++) {
               const pageBtn = document.createElement("button");
-              pageBtn.className = `page-btn ${
-                i === currentPage ? "active" : ""
-              }`;
+              pageBtn.className = `page-btn ${i === currentPage ? "active" : ""}`;
               pageBtn.textContent = i;
               pageBtn.onclick = () => goToPage(i);
               pageNumbersContainer.appendChild(pageBtn);
@@ -906,12 +430,8 @@
 
           const infoSpan = document.getElementById(infoId);
           if (infoSpan) {
-            const startIndex =
-              filteredRows.length > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0;
-            const endIndex = Math.min(
-              currentPage * rowsPerPage,
-              filteredRows.length
-            );
+            const startIndex = filteredRows.length > 0 ? (currentPage - 1) * rowsPerPage + 1 : 0;
+            const endIndex = Math.min(currentPage * rowsPerPage, filteredRows.length);
             infoSpan.textContent = `Menampilkan ${startIndex}-${endIndex} dari ${filteredRows.length} data`;
           }
         }
@@ -931,7 +451,6 @@
               return text.includes(searchTerm);
             });
             currentPage = 1;
-            updateRowNumbers();
             displayRows();
             updatePaginationControls();
           });
@@ -947,42 +466,30 @@
         }
 
         const prevBtn = document.getElementById(prevBtnId);
+        if (prevBtn) prevBtn.addEventListener("click", () => goToPage(currentPage - 1));
         const nextBtn = document.getElementById(nextBtnId);
-        if (prevBtn)
-          prevBtn.addEventListener("click", () => goToPage(currentPage - 1));
-        if (nextBtn)
-          nextBtn.addEventListener("click", () => goToPage(currentPage + 1));
+        if (nextBtn) nextBtn.addEventListener("click", () => goToPage(currentPage + 1));
 
-        updateRowNumbers();
         displayRows();
         updatePaginationControls();
       }
 
       document.addEventListener("DOMContentLoaded", function () {
-        // Setup untuk tabel "Hasil Normalisasi Data"
-        setupTable(
-          "normalizedContainer",
-          "searchNormalized",
-          "normalizedRowsPerPage",
-          "normalizedPrev",
-          "normalizedPages",
-          "normalizedNext",
-          "normalizedInfo"
-        );
-
-        // Loop untuk semua tabel hasil clustering
-        const clusteringContainers =
-          document.querySelectorAll("#tableContainer");
-        clusteringContainers.forEach((container, index) => {
-          setupTable(
-            container.id,
-            "searchInput",
-            "rowsPerPage",
-            "prevPage",
-            "pageNumbers",
-            "nextPage",
-            "showingInfo"
-          );
+        makeTablesResponsive();
+        setupTable("normalizedContainer", "searchNormalized", "normalizedRowsPerPage", "normalizedPrev", "normalizedPages", "normalizedNext", "normalizedInfo");
+        
+        const clusterTables = document.querySelectorAll('[id^="tableContainer_"]');
+        clusterTables.forEach(container => {
+            const index = container.id.split('_')[1];
+            setupTable(
+                `tableContainer_${index}`,
+                `searchInput_${index}`,
+                `rowsPerPage_${index}`,
+                `prevPage_${index}`,
+                `pageNumbers_${index}`,
+                `nextPage_${index}`,
+                `showingInfo_${index}`
+            );
         });
       });
     </script>
