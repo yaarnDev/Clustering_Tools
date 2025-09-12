@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>History Clustering</title>
+</head>
+<body>
+    <h2>History Clustering - {{ session.username }}</h2>
+    <a href="{{ url_for('dashboard') }}">Kembali ke Dashboard</a> | <a href="{{ url_for('logout') }}">Logout</a>
+    <hr>
+    {% for record in history_data %}
+        <div style="border: 1px solid #ccc; margin-bottom: 20px; padding: 15px;">
+            <h3>Hasil untuk file: {{ record.filename }}</h3>
+            <p><strong>Tanggal:</strong> {{ record.timestamp.strftime('%d %B %Y %H:%M:%S') }} UTC</p>
+            <p><strong>Skor Silhouette:</strong> {{ record.cluster_results_summary.silhouette_score }}</p>
+            <h4>Data Hasil Clustering:</h4>
+            <pre>{{ record.results_data | tojson(indent=2) }}</pre>
+            <h4>Plot Gambar:</h4>
+            <img src="{{ url_for('static', filename=record.plot_paths.scatter.split('static/')[1]) }}" width="300">
+            </div>
+    {% else %}
+        <p>Anda belum memiliki riwayat clustering.</p>
+    {% endfor %}
+</body>
+</html>

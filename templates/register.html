@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register</title>
+</head>
+<body>
+    <h2>Buat Akun Baru</h2>
+    <form method="post">
+        Username: <input type="text" name="username" required><br>
+        Password: <input type="password" name="password" required><br>
+        <button type="submit">Register</button>
+    </form>
+    <p>Sudah punya akun? <a href="{{ url_for('login') }}">Login di sini</a></p>
+</body>
+</html>
