@@ -38,5 +38,5 @@ Ikuti langkah-langkah berikut untuk menjalankan project ini di lingkungan lokal 
 
 **1. Clone Repository**
 ```bash
-git clone [URL_REPOSITORY_ANDA]
-cd [NAMA_FOLDER_PROJECT]
+git clone https://github.com/yaarnDev/Clustering_Tools.git
+cd Clustering_Tools
