@@ -18,7 +18,7 @@ Berikut adalah tampilan aplikasi saat sedang memproses data clustering:
 * **Library Python**:
     * Pandas (untuk manipulasi data)
     * Scikit-learn (untuk algoritma clustering)
-    * *Tambahkan library lain yang Anda gunakan di sini*
+    * K-Means Clustering (untuk kluster data)*
 
 ---
 
