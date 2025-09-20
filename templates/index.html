@@ -1,372 +1,640 @@
 <!DOCTYPE html>
 <html lang="id">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Upload Clustering</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    animation: {
-                        'gradient': 'gradient 6s ease infinite',
-                        'float': 'float 6s ease-in-out infinite',
-                        'pulse-slow': 'pulse 3s ease-in-out infinite',
-                        'fade-in': 'fadeIn 0.8s ease-out',
-                        'slide-up': 'slideUp 0.6s ease-out',
-                        'scale-in': 'scaleIn 0.5s ease-out'
-                    },
-                    keyframes: {
-                        gradient: {
-                            '0%, 100%': { backgroundPosition: '0% 50%' },
-                            '50%': { backgroundPosition: '100% 50%' }
-                        },
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' }
-                        },
-                        fadeIn: {
-                            '0%': { opacity: '0' },
-                            '100%': { opacity: '1' }
-                        },
-                        slideUp: {
-                            '0%': { transform: 'translateY(30px)', opacity: '0' },
-                            '100%': { transform: 'translateY(0)', opacity: '1' }
-                        },
-                        scaleIn: {
-                            '0%': { transform: 'scale(0.9)', opacity: '0' },
-                            '100%': { transform: 'scale(1)', opacity: '1' }
-                        }
-                    }
-                }
-            }
-        }
+      tailwind.config = {
+        theme: {
+          extend: {
+            animation: {
+              gradient: "gradient 6s ease infinite",
+              float: "float 6s ease-in-out infinite",
+              "pulse-slow": "pulse 3s ease-in-out infinite",
+              "fade-in": "fadeIn 0.8s ease-out",
+              "slide-up": "slideUp 0.6s ease-out",
+              "scale-in": "scaleIn 0.5s ease-out",
+            },
+            keyframes: {
+              gradient: {
+                "0%, 100%": { backgroundPosition: "0% 50%" },
+                "50%": { backgroundPosition: "100% 50%" },
+              },
+              float: {
+                "0%, 100%": { transform: "translateY(0px)" },
+                "50%": { transform: "translateY(-10px)" },
+              },
+              fadeIn: {
+                "0%": { opacity: "0" },
+                "100%": { opacity: "1" },
+              },
+              slideUp: {
+                "0%": { transform: "translateY(30px)", opacity: "0" },
+                "100%": { transform: "translateY(0)", opacity: "1" },
+              },
+              scaleIn: {
+                "0%": { transform: "scale(0.9)", opacity: "0" },
+                "100%": { transform: "scale(1)", opacity: "1" },
+              },
+            },
+          },
+        },
+      };
     </script>
     <style>
-        .preview-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 0.875rem;
-            background-color: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(5px);
-            border-radius: 0.75rem;
-            overflow: hidden;
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-        .preview-table th, .preview-table td {
-            padding: 0.75rem;
-            text-align: left;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            white-space: nowrap;
-        }
-        .preview-table th {
-            font-weight: 600;
-            background-color: rgba(255, 255, 255, 0.1);
-        }
-        .preview-table tbody tr:last-child td {
-            border-bottom: none;
-        }
+      .preview-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+        background-color: rgba(255, 255, 255, 0.05);
+        backdrop-filter: blur(5px);
+        border-radius: 0.75rem;
+        overflow: hidden;
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+      .preview-table th,
+      .preview-table td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        white-space: nowrap;
+      }
+      .preview-table th {
+        font-weight: 600;
+        background-color: rgba(255, 255, 255, 0.1);
+      }
+      .preview-table tbody tr:last-child td {
+        border-bottom: none;
+      }
     </style>
-</head>
-<body
+  </head>
+  <body
     class="min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900 animate-gradient bg-[length:400%_400%] p-4 sm:p-6"
   >
     <div class="fixed inset-0 overflow-hidden pointer-events-none">
-      <div class="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-float"></div>
-      <div class="absolute top-40 right-32 w-48 h-48 bg-blue-500/10 rounded-full blur-xl animate-float" style="animation-delay: -2s"></div>
-      <div class="absolute bottom-32 left-1/4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl animate-float" style="animation-delay: -4s"></div>
-      <div class="absolute bottom-20 right-20 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-float" style="animation-delay: -1s"></div>
+      <div
+        class="absolute top-20 left-20 w-32 h-32 bg-purple-500/10 rounded-full blur-xl animate-float"
+      ></div>
+      <div
+        class="absolute top-40 right-32 w-48 h-48 bg-blue-500/10 rounded-full blur-xl animate-float"
+        style="animation-delay: -2s"
+      ></div>
+      <div
+        class="absolute bottom-32 left-1/4 w-24 h-24 bg-indigo-500/10 rounded-full blur-xl animate-float"
+        style="animation-delay: -4s"
+      ></div>
+      <div
+        class="absolute bottom-20 right-20 w-40 h-40 bg-pink-500/10 rounded-full blur-xl animate-float"
+        style="animation-delay: -1s"
+      ></div>
     </div>
     <div class="absolute top-4 right-4 z-20">
-      <div class="bg-white/10 backdrop-blur-lg rounded-full py-2 px-4 text-sm text-gray-300 flex items-center space-x-4">
+      <div
+        class="bg-white/10 backdrop-blur-lg rounded-full py-2 px-4 text-sm text-gray-300 flex items-center space-x-4"
+      >
         <span> Halo, <strong>{{ session.username }}</strong> </span>
-        <a href="{{ url_for('history') }}" class="hover:text-white transition-colors font-medium">History</a>
-        <a href="{{ url_for('logout') }}" class="hover:text-white text-pink-400 transition-colors font-semibold">Logout</a>
+        <a
+          href="{{ url_for('history') }}"
+          class="hover:text-white transition-colors font-medium"
+          >History</a
+        >
+        <a
+          href="{{ url_for('logout') }}"
+          class="hover:text-white text-pink-400 transition-colors font-semibold"
+          >Logout</a
+        >
       </div>
     </div>
 
     <div class="relative max-w-2xl w-full mx-auto animate-fade-in">
-        <div class="text-center mb-12 animate-slide-up">
-            <div class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6 animate-pulse-slow">
-                <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      <div class="text-center mb-12 animate-slide-up">
+        <div
+          class="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full mb-6 animate-pulse-slow"
+        >
+          <svg
+            class="w-10 h-10 text-white"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+            ></path>
+          </svg>
+        </div>
+        <h1
+          class="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent"
+        >
+          Clustering Nilai
+        </h1>
+        <p class="text-xl text-gray-300 font-light">
+          Analisis dan pengelompokan data mahasiswa dengan teknologi AI
+        </p>
+      </div>
+
+      <div
+        class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 animate-scale-in"
+        style="animation-delay: 0.2s"
+      >
+        <form
+          id="clusteringForm"
+          method="post"
+          action="/process"
+          enctype="multipart/form-data"
+          class="space-y-8"
+        >
+          <div class="space-y-4">
+            <label class="block text-white text-lg font-semibold mb-4">
+              📊 Unggah File Excel/CSV
+            </label>
+            <div class="relative">
+              <input
+                type="file"
+                name="file"
+                id="fileInput"
+                required
+                accept=".xlsx,.xls,.csv"
+                class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10"
+              />
+              <div
+                id="dropZone"
+                class="border-2 border-dashed border-purple-400/50 rounded-2xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all duration-300 hover:border-purple-400 group cursor-pointer"
+              >
+                <div id="uploadContent">
+                  <svg
+                    class="w-16 h-16 text-purple-400 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
+                    ></path>
+                  </svg>
+                  <p class="text-white text-lg mb-2">
+                    Drag & drop file atau klik untuk browse
+                  </p>
+                  <p class="text-gray-400 text-sm">
+                    Mendukung format .xlsx, .xls, .csv
+                  </p>
+                </div>
+                <div id="selectedFile" class="hidden">
+                  <svg
+                    class="w-12 h-12 text-green-400 mx-auto mb-3"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                    ></path>
+                  </svg>
+                  <p class="text-green-400 font-semibold" id="fileName"></p>
+                  <p class="text-gray-400 text-sm">File siap diproses</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="filePreviewContainer" class="hidden">
+            <h3 class="text-white text-lg font-semibold mb-3">
+              <span class="mr-2">👀</span>Pratinjau File
+            </h3>
+            <div id="filePreview" class="overflow-x-auto max-h-64"></div>
+          </div>
+
+          <div id="featureSelectionContainer" class="hidden space-y-4">
+            <h3 class="text-white text-lg font-semibold mt-4">
+              ⚙️ Pilih Kolom untuk Clustering
+            </h3>
+            <div
+              id="featureCheckboxes"
+              class="grid grid-cols-2 md:grid-cols-3 gap-4"
+            ></div>
+            <div class="text-red-400 text-sm hidden" id="selectionWarning">
+              Pilih minimal 2 kolom numerik untuk proses clustering.
+            </div>
+          </div>
+
+          <div class="flex justify-center pt-4">
+            <button
+              type="submit"
+              id="submitBtn"
+              class="group relative px-12 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-lg"
+            >
+              <span id="submitText" class="flex items-center">
+                <svg
+                  class="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  ></path>
                 </svg>
+                Mulai Clustering
+              </span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div
+        class="grid md:grid-cols-3 gap-6 mt-12 animate-slide-up"
+        style="animation-delay: 0.4s"
+      >
+        <div
+          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+        >
+          <div class="text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                ></path>
+              </svg>
             </div>
-            <h1 class="text-5xl font-bold text-white mb-4 bg-gradient-to-r from-purple-400 via-pink-400 to-blue-400 bg-clip-text text-transparent">
-                Clustering Nilai
-            </h1>
-            <p class="text-xl text-gray-300 font-light">
-                Analisis dan pengelompokan data mahasiswa dengan teknologi AI
+            <h3 class="text-white font-semibold mb-2">Analisis Cerdas</h3>
+            <p class="text-gray-400 text-sm">
+              Algoritma machine learning untuk clustering yang akurat
             </p>
+          </div>
         </div>
-
-        <div class="bg-white/10 backdrop-blur-lg rounded-3xl shadow-2xl border border-white/20 p-8 animate-scale-in" style="animation-delay: 0.2s;">
-            <form id="clusteringForm" method="post" action="/process" enctype="multipart/form-data" class="space-y-8">
-                <div class="space-y-4">
-                    <label class="block text-white text-lg font-semibold mb-4">
-                        📊 Unggah File Excel/CSV
-                    </label>
-                    <div class="relative">
-                        <input type="file" name="file" id="fileInput" required accept=".xlsx,.xls,.csv" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
-                        <div id="dropZone" class="border-2 border-dashed border-purple-400/50 rounded-2xl p-8 text-center bg-white/5 hover:bg-white/10 transition-all duration-300 hover:border-purple-400 group cursor-pointer">
-                            <div id="uploadContent">
-                                <svg class="w-16 h-16 text-purple-400 mx-auto mb-4 group-hover:scale-110 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path>
-                                </svg>
-                                <p class="text-white text-lg mb-2">Drag & drop file atau klik untuk browse</p>
-                                <p class="text-gray-400 text-sm">Mendukung format .xlsx, .xls, .csv</p>
-                            </div>
-                            <div id="selectedFile" class="hidden">
-                                <svg class="w-12 h-12 text-green-400 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                                </svg>
-                                <p class="text-green-400 font-semibold" id="fileName"></p>
-                                <p class="text-gray-400 text-sm">File siap diproses</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div id="filePreviewContainer" class="hidden">
-                    <h3 class="text-white text-lg font-semibold mb-3">
-                        <span class="mr-2">👀</span>Pratinjau File
-                    </h3>
-                    <div id="filePreview" class="overflow-x-auto max-h-64">
-                    </div>
-                </div>
-
-                <div id="featureSelectionContainer" class="hidden space-y-4">
-                    <h3 class="text-white text-lg font-semibold mt-4">
-                        ⚙️ Pilih Kolom untuk Clustering
-                    </h3>
-                    <div id="featureCheckboxes" class="grid grid-cols-2 md:grid-cols-3 gap-4">
-                    </div>
-                    <div class="text-red-400 text-sm hidden" id="selectionWarning">
-                        Pilih minimal 2 kolom numerik untuk proses clustering.
-                    </div>
-                </div>
-
-                <div class="flex justify-center pt-4">
-                    <button type="submit" id="submitBtn" class="group relative px-12 py-4 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-bold rounded-2xl shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300 text-lg">
-                        <span id="submitText" class="flex items-center">
-                            <svg class="w-6 h-6 mr-3 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
-                            </svg>
-                            Mulai Clustering
-                        </span>
-                    </button>
-                </div>
-            </form>
+        <div
+          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+        >
+          <div class="text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"
+                ></path>
+              </svg>
+            </div>
+            <h3 class="text-white font-semibold mb-2">Visualisasi Data</h3>
+            <p class="text-gray-400 text-sm">
+              Grafik dan chart interaktif untuk insight yang jelas
+            </p>
+          </div>
         </div>
-
-        <div class="grid md:grid-cols-3 gap-6 mt-12 animate-slide-up" style="animation-delay: 0.4s;">
-            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                <div class="text-center"><div class="w-12 h-12 bg-gradient-to-r from-blue-500 to-cyan-500 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg></div><h3 class="text-white font-semibold mb-2">Analisis Cerdas</h3><p class="text-gray-400 text-sm">Algoritma machine learning untuk clustering yang akurat</p></div>
+        <div
+          class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105"
+        >
+          <div class="text-center">
+            <div
+              class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4"
+            >
+              <svg
+                class="w-6 h-6 text-white"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+                ></path>
+              </svg>
             </div>
-            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                <div class="text-center"><div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path></svg></div><h3 class="text-white font-semibold mb-2">Visualisasi Data</h3><p class="text-gray-400 text-sm">Grafik dan chart interaktif untuk insight yang jelas</p></div>
-            </div>
-            <div class="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:bg-white/10 transition-all duration-300 hover:scale-105">
-                <div class="text-center"><div class="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center mx-auto mb-4"><svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg></div><h3 class="text-white font-semibold mb-2">Data Aman</h3><p class="text-gray-400 text-sm">Enkripsi dan keamanan data tingkat enterprise</p></div>
-            </div>
+            <h3 class="text-white font-semibold mb-2">Data Aman</h3>
+            <p class="text-gray-400 text-sm">
+              Enkripsi dan keamanan data tingkat enterprise
+            </p>
+          </div>
         </div>
+      </div>
     </div>
 
-    <div id="loadingModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center">
-        <div class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 text-center max-w-md mx-4"><div class="relative mb-6"><div class="w-24 h-24 mx-auto relative"><div class="absolute inset-0 border-4 border-purple-500/30 rounded-full"></div><div class="absolute inset-0 border-4 border-transparent border-t-purple-500 rounded-full animate-spin"></div><div class="absolute inset-2 border-4 border-transparent border-r-pink-500 rounded-full animate-spin" style="animation-direction: reverse; animation-duration: 1.5s;"></div><div class="absolute inset-4 border-4 border-transparent border-b-blue-500 rounded-full animate-spin" style="animation-duration: 2s;"></div></div></div><h3 class="text-2xl font-bold text-white mb-4">Memproses Data</h3><p class="text-gray-300 mb-6">Algoritma clustering sedang menganalisis data Anda...</p><div class="space-y-3 text-left"><div id="step1" class="flex items-center text-gray-400"><div class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"><div class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"></div></div><span>Membaca file data</span></div><div id="step2" class="flex items-center text-gray-400"><div class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"><div class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"></div></div><span>Preprocessing data</span></div><div id="step3" class="flex items-center text-gray-400"><div class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"><div class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"></div></div><span>Menjalankan algoritma clustering</span></div><div id="step4" class="flex items-center text-gray-400"><div class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"><div class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"></div></div><span>Menyiapkan visualisasi</span></div></div><div class="mt-6 text-sm text-gray-400">Mohon tunggu, proses ini mungkin memakan waktu beberapa menit...</div></div>
+    <div
+      id="loadingModal"
+      class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden flex items-center justify-center"
+    >
+      <div
+        class="bg-white/10 backdrop-blur-lg rounded-3xl p-8 border border-white/20 text-center max-w-md mx-4"
+      >
+        <div class="relative mb-6">
+          <div class="w-24 h-24 mx-auto relative">
+            <div
+              class="absolute inset-0 border-4 border-purple-500/30 rounded-full"
+            ></div>
+            <div
+              class="absolute inset-0 border-4 border-transparent border-t-purple-500 rounded-full animate-spin"
+            ></div>
+            <div
+              class="absolute inset-2 border-4 border-transparent border-r-pink-500 rounded-full animate-spin"
+              style="animation-direction: reverse; animation-duration: 1.5s"
+            ></div>
+            <div
+              class="absolute inset-4 border-4 border-transparent border-b-blue-500 rounded-full animate-spin"
+              style="animation-duration: 2s"
+            ></div>
+          </div>
+        </div>
+        <h3 class="text-2xl font-bold text-white mb-4">Memproses Data</h3>
+        <p class="text-gray-300 mb-6">
+          Algoritma clustering sedang menganalisis data Anda...
+        </p>
+        <div class="space-y-3 text-left">
+          <div id="step1" class="flex items-center text-gray-400">
+            <div
+              class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"
+            >
+              <div
+                class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"
+              ></div>
+            </div>
+            <span>Membaca file data</span>
+          </div>
+          <div id="step2" class="flex items-center text-gray-400">
+            <div
+              class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"
+            >
+              <div
+                class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"
+              ></div>
+            </div>
+            <span>Preprocessing data</span>
+          </div>
+          <div id="step3" class="flex items-center text-gray-400">
+            <div
+              class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"
+            >
+              <div
+                class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"
+              ></div>
+            </div>
+            <span>Menjalankan algoritma clustering</span>
+          </div>
+          <div id="step4" class="flex items-center text-gray-400">
+            <div
+              class="w-6 h-6 rounded-full border-2 border-gray-400 mr-3 flex items-center justify-center"
+            >
+              <div
+                class="w-2 h-2 bg-gray-400 rounded-full opacity-0 transition-opacity duration-300"
+              ></div>
+            </div>
+            <span>Menyiapkan visualisasi</span>
+          </div>
+        </div>
+        <div class="mt-6 text-sm text-gray-400">
+          Mohon tunggu, proses ini mungkin memakan waktu beberapa menit...
+        </div>
+      </div>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const fileInput = document.getElementById('fileInput');
-            const dropZone = document.getElementById('dropZone');
-            const uploadContent = document.getElementById('uploadContent');
-            const selectedFileDiv = document.getElementById('selectedFile');
-            const fileNameElement = document.getElementById('fileName');
-            const filePreviewContainer = document.getElementById('filePreviewContainer');
-            const filePreview = document.getElementById('filePreview');
-            const featureSelectionContainer = document.getElementById('featureSelectionContainer');
-            const featureCheckboxes = document.getElementById('featureCheckboxes');
-            const selectionWarning = document.getElementById('selectionWarning');
-            const clusteringForm = document.getElementById('clusteringForm');
-            const loadingModal = document.getElementById('loadingModal');
+      document.addEventListener("DOMContentLoaded", function () {
+        const fileInput = document.getElementById("fileInput");
+        const dropZone = document.getElementById("dropZone");
+        const uploadContent = document.getElementById("uploadContent");
+        const selectedFileDiv = document.getElementById("selectedFile");
+        const fileNameElement = document.getElementById("fileName");
+        const filePreviewContainer = document.getElementById(
+          "filePreviewContainer"
+        );
+        const filePreview = document.getElementById("filePreview");
+        const featureSelectionContainer = document.getElementById(
+          "featureSelectionContainer"
+        );
+        const featureCheckboxes = document.getElementById("featureCheckboxes");
+        const selectionWarning = document.getElementById("selectionWarning");
+        const clusteringForm = document.getElementById("clusteringForm");
+        const loadingModal = document.getElementById("loadingModal");
 
-            // --- Event Listeners ---
-            fileInput.addEventListener('change', handleFileSelect);
-            dropZone.addEventListener('dragover', handleDragOver);
-            dropZone.addEventListener('dragleave', handleDragLeave);
-            dropZone.addEventListener('drop', handleDrop);
-            clusteringForm.addEventListener('submit', handleFormSubmit);
+        // --- Event Listeners ---
+        fileInput.addEventListener("change", handleFileSelect);
+        dropZone.addEventListener("dragover", handleDragOver);
+        dropZone.addEventListener("dragleave", handleDragLeave);
+        dropZone.addEventListener("drop", handleDrop);
+        clusteringForm.addEventListener("submit", handleFormSubmit);
 
-            // --- Handler Functions ---
-            function handleDragOver(e) {
-                e.preventDefault();
-                dropZone.classList.add('border-purple-400', 'bg-white/15');
-            }
+        // --- Handler Functions ---
+        function handleDragOver(e) {
+          e.preventDefault();
+          dropZone.classList.add("border-purple-400", "bg-white/15");
+        }
 
-            function handleDragLeave(e) {
-                e.preventDefault();
-                dropZone.classList.remove('border-purple-400', 'bg-white/15');
-            }
+        function handleDragLeave(e) {
+          e.preventDefault();
+          dropZone.classList.remove("border-purple-400", "bg-white/15");
+        }
 
-            function handleDrop(e) {
-                e.preventDefault();
-                dropZone.classList.remove('border-purple-400', 'bg-white/15');
-                if (e.dataTransfer.files.length > 0) {
-                    fileInput.files = e.dataTransfer.files;
-                    handleFileSelect();
-                }
-            }
-            
-            async function handleFileSelect() {
-                const file = fileInput.files[0];
-                if (!file) {
-                    resetUI();
-                    return;
-                }
+        function handleDrop(e) {
+          e.preventDefault();
+          dropZone.classList.remove("border-purple-400", "bg-white/15");
+          if (e.dataTransfer.files.length > 0) {
+            fileInput.files = e.dataTransfer.files;
+            handleFileSelect();
+          }
+        }
 
-                // Update UI to show selected file
-                fileNameElement.textContent = file.name;
-                uploadContent.classList.add('hidden');
-                selectedFileDiv.classList.remove('hidden');
-                selectedFileDiv.classList.add('animate-scale-in');
-                
-                // Show containers and loading messages
-                filePreviewContainer.classList.remove('hidden');
-                featureSelectionContainer.classList.add('hidden');
-                filePreview.innerHTML = `<p class="text-gray-400 text-center py-4">Memuat pratinjau...</p>`;
-                featureCheckboxes.innerHTML = `<p class="text-gray-400 text-center py-4 col-span-full">Memuat pilihan kolom...</p>`;
+        async function handleFileSelect() {
+          const file = fileInput.files[0];
+          if (!file) {
+            resetUI();
+            return;
+          }
 
-                const formData = new FormData();
-                formData.append('file', file);
-                
-                // Fetch preview and columns in parallel for speed
-                await Promise.all([
-                    fetchPreview(new FormData(clusteringForm)),
-                    fetchColumns(new FormData(clusteringForm))
-                ]);
-            }
+          fileNameElement.textContent = file.name;
+          uploadContent.classList.add("hidden");
+          selectedFileDiv.classList.remove("hidden");
+          selectedFileDiv.classList.add("animate-scale-in");
 
-            async function fetchPreview(formData) {
-                try {
-                    const response = await fetch('/preview_excel', { method: 'POST', body: formData });
-                    const responseText = await response.text();
-                    filePreview.innerHTML = response.ok ? responseText : `<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">${responseText}</div>`;
-                } catch (error) {
-                    filePreview.innerHTML = `<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Kesalahan Jaringan saat memuat pratinjau.</div>`;
-                }
-            }
-            
-            async function fetchColumns(formData) {
-                try {
-                    const response = await fetch('/get_columns', { method: 'POST', body: formData });
-                    const data = await response.json();
+          filePreviewContainer.classList.remove("hidden");
+          featureSelectionContainer.classList.add("hidden");
+          filePreview.innerHTML = `<p class="text-gray-400 text-center py-4">Memuat pratinjau...</p>`;
+          featureCheckboxes.innerHTML = `<p class="text-gray-400 text-center py-4 col-span-full">Memuat pilihan kolom...</p>`;
 
-                    if (response.ok && data.columns) {
-                        generateFeatureCheckboxes(data.columns);
-                        featureSelectionContainer.classList.remove('hidden');
-                    } else {
-                        featureCheckboxes.innerHTML = `<p class="text-red-400 text-center py-4 col-span-full">${data.error || 'Gagal memuat kolom.'}</p>`;
-                        featureSelectionContainer.classList.remove('hidden');
-                    }
-                } catch (error) {
-                    featureCheckboxes.innerHTML = `<p class="text-red-400 text-center py-4 col-span-full">Kesalahan Jaringan saat memuat kolom.</p>`;
-                    featureSelectionContainer.classList.remove('hidden');
-                }
-            }
-            
-            function generateFeatureCheckboxes(columns) {
-                featureCheckboxes.innerHTML = '';
-                const ignoredCols = ["No", "Nama", "NIM", "Cluster", "Kategori"];
-                let hasOptions = false;
+          const formData = new FormData();
+          formData.append("file", file);
 
-                columns.forEach(colName => {
-                    if (!ignoredCols.includes(colName)) {
-                        hasOptions = true;
-                        const checkboxDiv = document.createElement('div');
-                        checkboxDiv.className = 'flex items-center p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors duration-200';
-                        checkboxDiv.innerHTML = `
-                            <input type="checkbox" name="selected_features" value="${colName}" id="checkbox-${colName}" class="h-4 w-4 text-purple-600 bg-gray-700 border-gray-600 rounded focus:ring-purple-500 focus:ring-2 cursor-pointer">
-                            <label for="checkbox-${colName}" class="ml-3 text-sm font-medium text-gray-300 cursor-pointer">${colName}</label>
-                        `;
-                        featureCheckboxes.appendChild(checkboxDiv);
-                    }
-                });
+          await Promise.all([
+            fetchPreview(new FormData(clusteringForm)),
+            fetchColumns(new FormData(clusteringForm)),
+          ]);
+        }
 
-                if (!hasOptions) {
-                    featureCheckboxes.innerHTML = `<p class="text-yellow-400 text-center py-4 col-span-full">Tidak ada kolom valid yang bisa dipilih untuk clustering.</p>`;
-                }
-            }
-
-            function handleFormSubmit(e) {
-                // Basic validation
-                if (!fileInput.files[0]) {
-                    e.preventDefault();
-                    alert('Silakan pilih file terlebih dahulu!');
-                    return;
-                }
-                const selected = document.querySelectorAll('input[name="selected_features"]:checked').length;
-                if (selected < 2) {
-                    e.preventDefault();
-                    selectionWarning.classList.remove('hidden');
-                    return;
-                }
-                
-                // If validation passes
-                selectionWarning.classList.add('hidden');
-                showLoading();
-                simulateProgress();
-            }
-
-            function resetUI() {
-                uploadContent.classList.remove('hidden');
-                selectedFileDiv.classList.add('hidden');
-                filePreviewContainer.classList.add('hidden');
-                featureSelectionContainer.classList.add('hidden');
-                filePreview.innerHTML = '';
-                featureCheckboxes.innerHTML = '';
-            }
-
-            function showLoading() {
-                loadingModal.classList.remove('hidden');
-                document.body.style.overflow = 'hidden';
-            }
-
-            function simulateProgress() {
-                // The progress simulation logic remains the same
-                const steps = ['step1', 'step2', 'step3', 'step4'];
-                const stepDurations = [2000, 3000, 5000, 2000];
-                let currentStep = 0;
-                function activateStep() {
-                    if (currentStep >= steps.length) return;
-                    
-                    const stepElement = document.getElementById(steps[currentStep]);
-                    // ... (rest of your simulation logic is fine)
-                    const circle = stepElement.querySelector('div');
-                    const dot = stepElement.querySelector('div > div');
-                    stepElement.classList.replace('text-gray-400', 'text-blue-400');
-                    circle.classList.replace('border-gray-400', 'border-blue-400');
-                    
-                    setTimeout(() => {
-                        stepElement.classList.replace('text-blue-400', 'text-green-400');
-                        circle.classList.replace('border-blue-400', 'border-green-400');
-                        dot.className = 'w-full h-full bg-green-400 rounded-full flex items-center justify-center';
-                        dot.innerHTML = `<svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
-                        currentStep++;
-                        activateStep();
-                    }, stepDurations[currentStep]);
-                }
-                setTimeout(activateStep, 500);
-            }
-
-            // --- Initial Setup for floating elements ---
-            const floatingElements = document.querySelectorAll('[class*="animate-float"]');
-            floatingElements.forEach((el, index) => {
-                el.style.animationDelay = `-${index * 2}s`;
+        async function fetchPreview(formData) {
+          try {
+            const response = await fetch("/preview_excel", {
+              method: "POST",
+              body: formData,
             });
+            const responseText = await response.text();
+            filePreview.innerHTML = response.ok
+              ? responseText
+              : `<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">${responseText}</div>`;
+          } catch (error) {
+            filePreview.innerHTML = `<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Kesalahan Jaringan saat memuat pratinjau.</div>`;
+          }
+        }
+
+        async function fetchColumns(formData) {
+          try {
+            const response = await fetch("/get_columns", {
+              method: "POST",
+              body: formData,
+            });
+            const data = await response.json();
+
+            if (response.ok && data.columns) {
+              generateFeatureCheckboxes(data.columns);
+              featureSelectionContainer.classList.remove("hidden");
+            } else {
+              featureCheckboxes.innerHTML = `<p class="text-red-400 text-center py-4 col-span-full">${
+                data.error || "Gagal memuat kolom."
+              }</p>`;
+              featureSelectionContainer.classList.remove("hidden");
+            }
+          } catch (error) {
+            featureCheckboxes.innerHTML = `<p class="text-red-400 text-center py-4 col-span-full">Kesalahan Jaringan saat memuat kolom.</p>`;
+            featureSelectionContainer.classList.remove("hidden");
+          }
+        }
+
+        function generateFeatureCheckboxes(columns) {
+          featureCheckboxes.innerHTML = "";
+          const ignoredCols = ["No", "Nama", "NIM", "Cluster", "Kategori"];
+          let hasOptions = false;
+
+          columns.forEach((colName) => {
+            if (!ignoredCols.includes(colName)) {
+              hasOptions = true;
+              const checkboxDiv = document.createElement("div");
+              checkboxDiv.className =
+                "flex items-center p-2 rounded-lg bg-white/5 hover:bg-white/10 transition-colors duration-200";
+              checkboxDiv.innerHTML = `
+                                <input type="checkbox" name="selected_features" value="${colName}" id="checkbox-${colName}" class="h-4 w-4 text-purple-600 bg-gray-700 border-gray-600 rounded-full focus:ring-purple-500 focus:ring-2 cursor-pointer">
+                                <label for="checkbox-${colName}" class="ml-3 text-sm font-medium text-gray-300 cursor-pointer">${colName}</label>
+                            `;
+              featureCheckboxes.appendChild(checkboxDiv);
+            }
+          });
+
+          if (!hasOptions) {
+            featureCheckboxes.innerHTML = `<p class="text-yellow-400 text-center py-4 col-span-full">Tidak ada kolom valid yang bisa dipilih untuk clustering.</p>`;
+          }
+        }
+
+        function handleFormSubmit(e) {
+          if (!fileInput.files[0]) {
+            e.preventDefault();
+            alert("Silakan pilih file terlebih dahulu!");
+            return;
+          }
+          const selected = document.querySelectorAll(
+            'input[name="selected_features"]:checked'
+          ).length;
+          if (selected < 2) {
+            e.preventDefault();
+            selectionWarning.classList.remove("hidden");
+            return;
+          }
+
+          selectionWarning.classList.add("hidden");
+          showLoading();
+          simulateProgress();
+        }
+
+        function resetUI() {
+          uploadContent.classList.remove("hidden");
+          selectedFileDiv.classList.add("hidden");
+          filePreviewContainer.classList.add("hidden");
+          featureSelectionContainer.classList.add("hidden");
+          filePreview.innerHTML = "";
+          featureCheckboxes.innerHTML = "";
+        }
+
+        function showLoading() {
+          loadingModal.classList.remove("hidden");
+          document.body.style.overflow = "hidden";
+        }
+        
+        // [PERBAIKAN] Mengganti logika animasi agar tidak mengubah bentuk lingkaran
+        function simulateProgress() {
+            const steps = ["step1", "step2", "step3", "step4"];
+            const stepDurations = [1500, 2000, 3000, 1000];
+            let currentStep = 0;
+
+            function activateStep() {
+                if (currentStep >= steps.length) return;
+
+                const stepElement = document.getElementById(steps[currentStep]);
+                const circle = stepElement.querySelector("div");
+                const dot = circle.querySelector("div");
+                const text = stepElement.querySelector("span");
+
+                // --- State: In Progress ---
+                text.classList.replace("text-gray-400", "text-white");
+                circle.classList.replace("border-gray-400", "border-blue-400");
+                dot.classList.remove("opacity-0");
+                dot.classList.add("animate-pulse"); // Optional: add pulse animation
+
+                // --- State: Transition to Complete ---
+                setTimeout(() => {
+                    text.classList.replace("text-blue-400", "text-green-400");
+                    circle.classList.replace("border-blue-400", "border-green-400");
+                    dot.classList.remove("animate-pulse");
+
+                    // Ganti isi lingkaran dengan SVG centang tanpa mengubah ukuran
+                    circle.innerHTML = `<svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>`;
+
+                    currentStep++;
+                    
+                    if (currentStep < steps.length) {
+                        setTimeout(activateStep, 500); 
+                    }
+                }, stepDurations[currentStep]);
+            }
+            setTimeout(activateStep, 500);
+        }
+
+        // --- Initial Setup for floating elements ---
+        const floatingElements = document.querySelectorAll(
+          '[class*="animate-float"]'
+        );
+        floatingElements.forEach((el, index) => {
+          el.style.animationDelay = `-${index * 2}s`;
         });
+      });
     </script>
-</body>
+  </body>
 </html>

@@ -41,9 +41,7 @@ def manual_kmeans(data, n_clusters=3, max_iter=300, random_state=42, n_init=10):
     best_inertia = float('inf')
     for _ in range(n_init):
         np.random.seed(random_state + _)
-        # Menangani kasus jika data lebih sedikit dari jumlah cluster
         if data.shape[0] < n_clusters:
-            # Tidak bisa melakukan clustering, kembalikan error atau hasil kosong
             return None, float('inf')
         centroids_indices = np.random.choice(data.shape[0], n_clusters, replace=False)
         centroids = data[centroids_indices]
@@ -51,10 +49,8 @@ def manual_kmeans(data, n_clusters=3, max_iter=300, random_state=42, n_init=10):
             distances = np.sqrt(((data - centroids[:, np.newaxis])**2).sum(axis=2))
             clusters = np.argmin(distances, axis=0)
             new_centroids = np.array([data[clusters == j].mean(axis=0) for j in range(n_clusters)])
-            # Cek jika ada cluster kosong
             for j in range(n_clusters):
                 if np.isnan(new_centroids[j]).any():
-                    # Jika ada cluster kosong, inisialisasi ulang centroid untuk cluster tsb
                     new_centroids[j] = data[np.random.choice(data.shape[0])]
             if np.allclose(centroids, new_centroids):
                 break
@@ -200,6 +196,8 @@ def process():
     for col_id in ['NIM', 'Nama']:
         if col_id in df.columns:
             df_normalized_display.insert(0, col_id, df.reset_index(drop=True).loc[df_normalized_display.index, col_id])
+    
+    df_normalized_display.insert(0, 'No', range(1, 1 + len(df_normalized_display)))
 
     os.makedirs("static/plots", exist_ok=True)
     plot_id = str(uuid.uuid4())
@@ -207,12 +205,12 @@ def process():
     scatter_path = f"static/plots/scatter_{plot_id}.png"
     plt.figure()
     sns.scatterplot(x=data_normalized[:, 0], y=data_normalized[:, 1], hue=df['Kategori'], palette='viridis')
-    plt.title("Visualisasi Clustering Mahasiswa")
+    plt.title("Visualisasi Clustering")
     plt.xlabel(selected_features[0])
     plt.ylabel(selected_features[1])
     plt.savefig(scatter_path)
     plt.close()
-
+    
     hist_paths = []
     for feature in selected_features:
         path = f"static/plots/hist_{feature.replace(' ', '_')}_{plot_id}.png"
@@ -226,57 +224,59 @@ def process():
     boxplot_path = f"static/plots/boxplot_{plot_id}.png"
     plt.figure()
     sns.boxplot(x=df['Kategori'], y=df[selected_features[0]], palette='coolwarm')
-    plt.title(f"Boxplot {selected_features[0]} berdasarkan Kategori")
+    plt.title(f"Boxplot {selected_features[0]}")
     plt.savefig(boxplot_path)
     plt.close()
     
     pie_path = f"static/plots/pie_{plot_id}.png"
     plt.figure()
     df['Kategori'].value_counts().plot.pie(autopct='%1.1f%%', colors=['#2ca02c', '#ff7f0e', '#d62728'])
-    plt.title("Proporsi Mahasiswa dalam Setiap Cluster")
+    plt.title("Proporsi Cluster")
     plt.ylabel("")
     plt.savefig(pie_path)
     plt.close()
     
+    # [PERBAIKAN HEATMAP] Mengubah plot heatmap menjadi lebih informatif
     heatmap_path = f"static/plots/heatmap_{plot_id}.png"
-    plt.figure(figsize=(10, 6))
-    sns.heatmap(df_normalized_display[selected_features], annot=False, cmap='YlGnBu')
-    plt.title("Heatmap Normalisasi Nilai")
-    plt.xlabel("Mata Kuliah / Fitur")
-    plt.ylabel("Mahasiswa / Data")
+    plt.figure(figsize=(12, 8))
+    sns.heatmap(
+        df_normalized_display[selected_features], 
+        annot=True, 
+        fmt=".2f",
+        cmap='YlGnBu',
+        cbar_kws={'label': 'Nilai Normalisasi'}
+    )
+    plt.title("Heatmap Normalisasi Data", fontsize=16)
+    plt.xlabel("Fitur", fontsize=12)
+    plt.ylabel("Data", fontsize=12)
+    plt.xticks(rotation=45, ha='right')
+    plt.yticks(rotation=0)
+    plt.tight_layout()
     plt.savefig(heatmap_path)
     plt.close()
 
     hasil_json = df_sorted.to_dict(orient='records')
     history_record = {
-        "user_id": ObjectId(session['user_id']),
-        "username": session['username'],
-        "filename": filename,
-        "selected_features": selected_features,
-        "cluster_results_summary": {"silhouette_score": silhouette, "inertia": inertia, "total_data": len(df_sorted)},
-        "results_data": hasil_json,
-        "plot_paths": {"scatter": scatter_path, "histograms": hist_paths, "boxplot": boxplot_path, "pie": pie_path, "heatmap": heatmap_path},
+        "user_id": ObjectId(session['user_id']),"username": session['username'],"filename": filename,
+        "selected_features": selected_features,"cluster_results_summary": {"silhouette_score": silhouette, "inertia": inertia, "total_data": len(df_sorted)},
+        "results_data": hasil_json,"plot_paths": {"scatter": scatter_path, "histograms": hist_paths, "boxplot": boxplot_path, "pie": pie_path, "heatmap": heatmap_path},
         "timestamp": datetime.datetime.utcnow()
     }
     history_collection.insert_one(history_record)
 
-    # [PERBAIKAN] Filter kolom untuk ditampilkan di tabel hasil
     identifier_cols = [col for col in ['No', 'NIM', 'Nama'] if col in df_sorted.columns]
     final_display_columns = identifier_cols + selected_features + ['Cluster', 'Kategori']
     df_display = df_sorted[final_display_columns]
 
+    df_display.to_csv('hasil_clustering.csv', index=False)
+
     return render_template("result.html", 
         tables=[df_display.to_html(classes="table table-bordered", index=False)], 
         normalized=df_normalized_display.to_html(classes="table table-sm table-striped", index=False), 
-        score=silhouette, 
-        inertia_score=inertia, 
-        scatter_plot=scatter_path, 
-        histograms=hist_paths, 
-        boxplot=boxplot_path, 
-        pie_chart=pie_path, 
+        score=silhouette, inertia_score=inertia, scatter_plot=scatter_path, 
+        histograms=hist_paths, boxplot=boxplot_path, pie_chart=pie_path, 
         heatmap_plot=heatmap_path
     )
-
 
 @app.route('/history')
 def history():
@@ -328,45 +328,49 @@ def delete_history(history_id):
 # BAGIAN 6: ROUTE LAINNYA
 # =================================================================
 
-# [BARU] Route untuk mengambil nama kolom dari file yang diupload secara efisien
 @app.route('/get_columns', methods=['POST'])
 def get_columns():
     if 'user_id' not in session:
         return jsonify({"error": "Sesi tidak valid, silakan login ulang."}), 401
-
     file = request.files.get('file')
     if not file:
         return jsonify({"error": "Tidak ada file yang diunggah."}), 400
-
     try:
-        filename = file.filename
         file.seek(0) 
-        if filename.endswith('.csv'):
+        if file.filename.endswith('.csv'):
             df_header = pd.read_csv(file, nrows=0)
         else:
             df_header = pd.read_excel(file, nrows=0)
-        
         return jsonify({"columns": df_header.columns.tolist()})
     except Exception as e:
         return jsonify({"error": f"Gagal membaca file: {str(e)}"}), 500
 
-# [DIUBAH] Menghapus validasi kolom statis dari pratinjau
 @app.route('/preview_excel', methods=['POST'])
 def preview_excel():
     file = request.files.get('file')
     if not file:
         return "No file uploaded", 400
-    
-    filename = file.filename
     try:
         file.seek(0)
-        if filename.endswith('.csv'):
+        if file.filename.endswith('.csv'):
             df = pd.read_csv(io.StringIO(file.read().decode('utf-8')), nrows=5)
         else:
             df = pd.read_excel(file, nrows=5)
         return df.to_html(classes="preview-table", index=False)
     except Exception as e:
-        return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Error membaca file: {e}</div>""", 500
+        return f"""<div class="bg-red-800/20 text-red-300 p-4 rounded-lg border border-red-800/50">Error: {e}</div>""", 500
+
+@app.route('/download')
+def download():
+    if 'user_id' not in session:
+        return redirect(url_for('login'))
+    
+    file_path = 'hasil_clustering.csv'
+    if not os.path.exists(file_path):
+        flash('File hasil tidak ditemukan. Lakukan proses clustering terlebih dahulu.', 'danger')
+        return redirect(url_for('dashboard'))
+        
+    return send_file(file_path, as_attachment=True, download_name='Hasil_Clustering.csv')
 
 @app.route('/download_histograms')
 def download_histograms():
