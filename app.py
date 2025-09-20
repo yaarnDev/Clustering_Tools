@@ -1,6 +1,3 @@
-# =================================================================
-# BAGIAN 1: IMPORT DAN SETUP APLIKASI
-# =================================================================
 import os
 import io
 import uuid
@@ -31,12 +28,7 @@ db = client.db_clustering
 users_collection = db.users
 history_collection = db.history
 
-# =================================================================
-# BAGIAN 2: FUNGSI-FUNGSI BANTUAN (LOGIKA CLUSTERING ANDA)
-# =================================================================
-
 def manual_kmeans(data, n_clusters=3, max_iter=300, random_state=42, n_init=10):
-    # Kode fungsi manual_kmeans Anda tidak berubah, sudah bagus.
     best_clusters = None
     best_inertia = float('inf')
     for _ in range(n_init):
@@ -61,10 +53,6 @@ def manual_kmeans(data, n_clusters=3, max_iter=300, random_state=42, n_init=10):
             best_clusters = clusters
     return best_clusters, best_inertia
 
-# =================================================================
-# BAGIAN 3: ROUTE UNTUK OTENTIKASI (LOGIN, REGISTER, LOGOUT)
-# =================================================================
-# Tidak ada perubahan di bagian ini.
 @app.route('/')
 def index():
     if 'user_id' in session:
@@ -109,10 +97,6 @@ def logout():
     flash('Anda telah berhasil logout.', 'success')
     return redirect(url_for('login'))
 
-# =================================================================
-# BAGIAN 4: ROUTE UTAMA APLIKASI (DASHBOARD & CLUSTERING)
-# =================================================================
-
 @app.route('/dashboard')
 def dashboard():
     if 'user_id' not in session:
@@ -142,7 +126,8 @@ def process():
         if filename.endswith('.csv'):
             df_original = pd.read_csv(file_content)
         else:
-            df_original = pd.read_excel(file_content)
+            # [PERBAIKAN TAMBAHAN] Menambahkan header=0 agar pembacaan file Excel lebih andal
+            df_original = pd.read_excel(file_content, header=0)
     except Exception as e:
         flash(f"Gagal membaca file: {e}", "danger")
         return redirect(url_for('dashboard'))
@@ -236,7 +221,6 @@ def process():
     plt.savefig(pie_path)
     plt.close()
     
-    # [PERBAIKAN HEATMAP] Mengubah plot heatmap menjadi lebih informatif
     heatmap_path = f"static/plots/heatmap_{plot_id}.png"
     plt.figure(figsize=(12, 8))
     sns.heatmap(
@@ -257,9 +241,14 @@ def process():
 
     hasil_json = df_sorted.to_dict(orient='records')
     history_record = {
-        "user_id": ObjectId(session['user_id']),"username": session['username'],"filename": filename,
-        "selected_features": selected_features,"cluster_results_summary": {"silhouette_score": silhouette, "inertia": inertia, "total_data": len(df_sorted)},
-        "results_data": hasil_json,"plot_paths": {"scatter": scatter_path, "histograms": hist_paths, "boxplot": boxplot_path, "pie": pie_path, "heatmap": heatmap_path},
+        "user_id": ObjectId(session['user_id']),
+        "username": session['username'],
+        "filename": filename,
+        "selected_features": selected_features,
+        # [PERBAIKAN UTAMA] Konversi tipe data numpy.float64 ke float standar Python
+        "cluster_results_summary": {"silhouette_score": float(silhouette), "inertia": float(inertia), "total_data": len(df_sorted)},
+        "results_data": hasil_json,
+        "plot_paths": {"scatter": scatter_path, "histograms": hist_paths, "boxplot": boxplot_path, "pie": pie_path, "heatmap": heatmap_path},
         "timestamp": datetime.datetime.utcnow()
     }
     history_collection.insert_one(history_record)
@@ -273,8 +262,12 @@ def process():
     return render_template("result.html", 
         tables=[df_display.to_html(classes="table table-bordered", index=False)], 
         normalized=df_normalized_display.to_html(classes="table table-sm table-striped", index=False), 
-        score=silhouette, inertia_score=inertia, scatter_plot=scatter_path, 
-        histograms=hist_paths, boxplot=boxplot_path, pie_chart=pie_path, 
+        score=silhouette, 
+        inertia_score=inertia, 
+        scatter_plot=scatter_path, 
+        histograms=hist_paths, 
+        boxplot=boxplot_path, 
+        pie_chart=pie_path, 
         heatmap_plot=heatmap_path
     )
 
@@ -294,10 +287,6 @@ def history():
     
     return render_template('history.html', history_data=history_list)
 
-# =================================================================
-# BAGIAN 5: ROUTE UNTUK MENGHAPUS HISTORY
-# =================================================================
-# Tidak ada perubahan di bagian ini.
 @app.route('/delete_history/<history_id>', methods=['POST'])
 def delete_history(history_id):
     if 'user_id' not in session:
@@ -323,10 +312,6 @@ def delete_history(history_id):
     except Exception as e:
         flash(f'Terjadi kesalahan saat menghapus riwayat: {e}', 'danger')
     return redirect(url_for('history'))
-
-# =================================================================
-# BAGIAN 6: ROUTE LAINNYA
-# =================================================================
 
 @app.route('/get_columns', methods=['POST'])
 def get_columns():
@@ -376,7 +361,8 @@ def download():
 def download_histograms():
     hist_files = [f for f in os.listdir('static/plots') if f.startswith('hist_')]
     if not hist_files:
-        return "Tidak ada file histogram yang dapat diunduh.", 404
+        flash('Tidak ada file histogram untuk diunduh.', 'warning')
+        return redirect(request.referrer or url_for('dashboard'))
     memory_file = io.BytesIO()
     with zipfile.ZipFile(memory_file, 'w', zipfile.ZIP_DEFLATED) as zf:
         for filename in hist_files:
@@ -385,9 +371,5 @@ def download_histograms():
     memory_file.seek(0)
     return send_file(memory_file, mimetype='application/zip', as_attachment=True, download_name='histograms.zip')
 
-
-# =================================================================
-# BAGIAN 7: MENJALANKAN APLIKASI
-# =================================================================
 if __name__ == '__main__':
     app.run(debug=True)
